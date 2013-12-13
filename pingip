@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+##Created by 2013.12.09
+##careersh2010@gmail.com
+
+import os
+import sys
+import re
+import subprocess
+import threading
+import pymongo
+import time
+
+
+time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
+conn = pymongo.Connection('localhost',27017)
+db = conn.ops
+posts = db.ops
+lock = threading.Lock()
+
+class GetIP(object):
+	def __init__(self):
+		pass
+
+	def get(self):
+		ips = []
+		ipstart = '119.254'
+		for i in range(1,256):
+			i = str(i)
+			for f in range(1,256):
+				f = str(f)
+				ip = ipstart + "." + i + "." + f
+				r = Ping(ip)
+				ips.append(r)
+		return ips
+
+class Ping(threading.Thread):
+	def __init__(self,ip):
+		threading.Thread.__init__(self)
+		self.ip = ip
+
+	def run(self):
+		res = os.popen('ping -c 2 -w 3 %s'%self.ip).read()
+		regex = re.compile("time=\d*", re.IGNORECASE | re.MULTILINE)
+		if len(regex.findall(res)) > 0:
+			i = {"IP":('%s'%self.ip),"status":"Host Up","time":time}
+			#print self.ip + ': Host Up'
+			posts.insert(i)
+		else:
+			pass
+
+if __name__ == '__main__':
+	f = GetIP().get()
+	for i in f:
+		i.start()
