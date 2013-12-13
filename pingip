@@ -24,11 +24,11 @@ class GetIP(object):
 	def get(self):
 		ips = []
 		ipstart = '119.254'
-		for i in range(1,256):
-			i = str(i)
-			for f in range(1,256):
-				f = str(f)
-				ip = ipstart + "." + i + "." + f
+		for three in range(1,256):
+			three = str(three)
+			for four in range(1,256):
+				four = str(four)
+				ip = ipstart + "." + three + "." + four
 				r = Ping(ip)
 				ips.append(r)
 		return ips
